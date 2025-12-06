@@ -1,0 +1,10 @@
+name: Initialize Repo Settings
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup:
+    uses: JWTestJW/.github/.github/workflows/set-protection.yml@main
+    secrets:
+      TOKEN: ${{ secrets.ORG_ADMIN_PAT }}
