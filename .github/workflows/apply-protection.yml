@@ -1,0 +1,36 @@
+name: Apply Branch Protection (JSONC Version)
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+
+jobs:
+  protect:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Remove comments from JSONC (convert to valid JSON)
+        run: |
+          mkdir clean
+          cat .github/protection/protection.jsonc \
+            | sed 's,//.*$,,' \
+            | sed '/^\s*$/d' \
+            > clean/protection.json
+
+      - name: Show processed JSON
+        run: cat clean/protection.json
+
+      - name: Apply branch protection
+        run: |
+          echo "Applying branch protection to main branch of ${{ github.repository }}"
+
+          curl -X PUT \
+            -H "Authorization: Bearer ${{ secrets.ADMIN_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/vnd.github+json" \
+            --data @clean/protection.json \
+            https://api.github.com/repos/${{ github.repository }}/branches/main/protection
