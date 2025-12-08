@@ -10,11 +10,15 @@ name: Auto Create Branches   # ワークフロー名
 permissions:
   contents: write            # ブランチ作成・push に必須
 
-on:
-  workflow_dispatch:         # 手動実行トリガー
+#on:
+#  workflow_dispatch:         # 手動実行トリガー
                              # ※ テンプレートから生成された直後は
                              #    push トリガーが動かないため、
                              #    手動実行が最も安全な方法
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
 
 jobs:
   create-branches:
