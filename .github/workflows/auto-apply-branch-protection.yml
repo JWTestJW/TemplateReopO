@@ -1,4 +1,9 @@
-name: Apply Branch Protection (JSONC Version)
+# ============================================
+# main ブランチに保護ルールを適用するワークフロー
+# （リポジトリ作成後の初回プッシュ時のみ実行）
+# ============================================
+
+name: Auto Apply Branch Protection
 
 on:
   workflow_dispatch: {}
@@ -8,6 +13,8 @@ on:
 jobs:
   protect:
     runs-on: ubuntu-latest
+    # 初回実行時（リポジトリ作成直後）または手動実行時のみ動作
+    if: github.run_number == 1 || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout
@@ -15,6 +22,7 @@ jobs:
 
       - name: Remove comments from JSONC (convert to valid JSON)
         run: |
+          # JSONC からコメントを除去して標準 JSON に変換
           mkdir clean
           cat .github/protection/protection.jsonc \
             | sed 's,//.*$,,' \
@@ -26,6 +34,7 @@ jobs:
 
       - name: Apply branch protection
         run: |
+          # GitHub API を使用してブランチ保護ルールを適用
           echo "Applying branch protection to main branch of ${{ github.repository }}"
 
           curl -X PUT \
